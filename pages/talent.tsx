@@ -3,7 +3,7 @@ import React from "react";
 import Header from "../components/Header";
 import { v4 as uuidv4 } from "uuid";
 import Title from "../components/Title";
-import talent from "../api/talent.json";
+import talentFromJSON from "../api/talent.json";
 import {
   FaTwitter as TwitterIcon,
   FaDiscord as DiscordIcon,
@@ -14,7 +14,58 @@ import PageContent from "../components/Layout/PageContent";
 import PageHeader from "../components/Layout/PageHeader";
 import Button from "../components/common/Button";
 
-const Talent = () => {
+/**
+ * Helper function to fetch specific fields from AddressForm API response
+ * @param data Field level AddressForm API response
+ * @param key  String you're trying to match in API response prompt 
+ * @returns Matching API response field if one exists, else null
+ */
+export const fetchFieldByString = (data: [{prompt: string, response: any}], key: string) => {
+  const filtered = data.filter((element) => {
+    return element.prompt.toLowerCase().includes(key.toLowerCase())
+  });
+
+  if (filtered.length > 0) {
+    return filtered[0].response;
+  }
+  return null;
+};
+
+
+export const getServerSideProps = async (context) => {
+  const formId = '38540f5f-4db7-4a25-a3dd-c6d48d2100e4';
+  const apiKey = '9f8597ed-74ea-4fbf-8f4d-f814214f874d'
+
+  const res = await fetch(
+    `https://stagef.api.addressform.io/ext-api/v1/form-responses?api_key=${apiKey}&form_id=${formId}`
+  );
+
+  const talentRaw = await res.json();
+
+
+  const talent = talentRaw.responses.map((data) => {
+    const responseData = data.response_data;
+    const metadata = JSON.parse(data.metadata);
+    console.log(metadata);
+    return {
+      name: fetchFieldByString(responseData, "name"),
+      twitter: fetchFieldByString(responseData, "twitter").replace("@",""), 
+      discord: fetchFieldByString(responseData, "discord"),
+      discordId: (metadata && metadata.user_id) ? metadata.user_id : "",
+      title: [fetchFieldByString(responseData, "Vocation")],
+      skills: fetchFieldByString(responseData, "skills")
+    }
+  });
+
+  return {
+      props: {talentFromServer: talent}
+  };
+}
+
+const Talent = (props) => {
+  const {talentFromServer} = props;
+
+  const talent = talentFromJSON.concat(talentFromServer);
   return (
     <>
       <PageHeader>
