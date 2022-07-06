@@ -83,7 +83,8 @@ const Talent = (props) => {
         <ul role="list" className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {talent.map((person, idx) => (
             <li
-              key={person.skills}
+              // key={person.skills}
+              key={idx}
               className="col-span-1  bg-white rounded-lg shadow-md divide-y divide-gray-200 flex flex-col justify-between"
             >
               <div className="w-full flex items-center justify-between p-6 space-x-6 ">
