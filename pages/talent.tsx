@@ -49,7 +49,7 @@ export const getServerSideProps = async (context) => {
     console.log(metadata);
     return {
       name: fetchFieldByString(responseData, "name"),
-      twitter: (fetchFieldByString(responseData, "twitter") ?? "").replace("@","").replace(" https://twitter.com/",""), 
+      twitter: (fetchFieldByString(responseData, "twitter") ?? "").replace("@","").replace("https://twitter.com/",""), 
       discord: fetchFieldByString(responseData, "discord"),
       discordId: (metadata && metadata.user_id) ? metadata.user_id : "",
       title: [fetchFieldByString(responseData, "Vocation")],
