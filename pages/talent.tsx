@@ -13,6 +13,7 @@ import Subheader from "../components/Subheader";
 import PageContent from "../components/Layout/PageContent";
 import PageHeader from "../components/Layout/PageHeader";
 import Button from "../components/common/Button";
+import { fetchTalentFormData } from "../utils/talent-form-data-fetching";
 
 /**
  * Helper function to fetch specific fields from AddressForm API response
@@ -33,32 +34,9 @@ export const fetchFieldByString = (data: [{prompt: string, response: any}], key:
 
 
 export const getServerSideProps = async (context) => {
-  const formId = '38540f5f-4db7-4a25-a3dd-c6d48d2100e4';
-  const apiKey = '9f8597ed-74ea-4fbf-8f4d-f814214f874d'
-
-  const res = await fetch(
-    `https://stagef.api.addressform.io/ext-api/v1/form-responses?api_key=${apiKey}&form_id=${formId}`
-  );
-
-  const talentRaw = await res.json();
-
-
-  const talent = talentRaw.responses.map((data) => {
-    const responseData = data.response_data;
-    const metadata = JSON.parse(data.metadata);
-    console.log(metadata);
-    return {
-      name: fetchFieldByString(responseData, "name"),
-      twitter: (fetchFieldByString(responseData, "twitter") ?? "").replace("@","").replace("https://twitter.com/",""), 
-      discord: fetchFieldByString(responseData, "discord"),
-      discordId: (metadata && metadata.user_id) ? metadata.user_id : "",
-      title: [fetchFieldByString(responseData, "Vocation")],
-      skills: fetchFieldByString(responseData, "skills")
-    }
-  });
-
+  const talentFormDataFromAPI = await fetchTalentFormData();
   return {
-      props: {talentFromServer: talent}
+      props: {talentFromServer: talentFormDataFromAPI}
   };
 }
 
